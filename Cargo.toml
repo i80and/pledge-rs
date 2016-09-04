@@ -2,6 +2,11 @@
 name = "pledge"
 version = "0.1.0"
 authors = ["Andrew Aldridge <i80and@foxquill.com>"]
+description = "Rust binding to OpenBSD's pledge(2) interface"
+readme = "README.md"
+repository = "https://github.com/i80and/pledge-rs"
+keywords = ["openbsd", "binding", "security"]
+license = "MIT"
 
 [dependencies]
 libc = "0.2"
