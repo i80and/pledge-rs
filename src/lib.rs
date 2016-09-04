@@ -94,7 +94,7 @@ pub fn pledge(_: &[Promise]) -> Result<(), Error> {
 
 #[cfg(test)]
 mod tests {
-    use super::{pledge, Promise, ToPromiseString, Error};
+    use super::{pledge, Promise, ToPromiseString};
 
     #[test]
     fn test_promise_str() {
@@ -107,6 +107,7 @@ mod tests {
     #[test]
     #[cfg(not(target_os = "openbsd"))]
     fn test_pledge_unsupported() {
+        use super::Error;
         assert_eq!(pledge(&vec![Promise::Stdio]).unwrap_err(), Error::UnsupportedPlatform);
     }
 
