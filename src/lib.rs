@@ -92,6 +92,19 @@ pub fn pledge(_: &[Promise]) -> Result<(), Error> {
     return Err(Error::UnsupportedPlatform);
 }
 
+#[macro_export]
+macro_rules! pledge {
+    ( $( $x:ident ),* ) => {
+        {
+            let mut promises = Vec::new();
+            $(
+                promises.push(Promise::$x);
+            )*
+            pledge(&promises)
+        }
+    };
+}
+
 #[cfg(test)]
 mod tests {
     use super::{pledge, Promise, ToPromiseString};
@@ -108,13 +121,13 @@ mod tests {
     #[cfg(not(target_os = "openbsd"))]
     fn test_pledge_unsupported() {
         use super::Error;
-        assert_eq!(pledge(&vec![Promise::Stdio]).unwrap_err(), Error::UnsupportedPlatform);
+        assert_eq!(pledge![Stdio].unwrap_err(), Error::UnsupportedPlatform);
     }
 
     #[test]
     #[cfg(target_os = "openbsd")]
     fn test_pledge_supported() {
-        pledge(&vec![Promise::Stdio]).unwrap();
-        assert!(pledge(&vec![Promise::Stdio, Promise::Audio]).is_err());
+        pledge![Stdio].unwrap();
+        assert!(pledge![Stdio, Audio].is_err());
     }
 }
