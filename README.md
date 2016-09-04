@@ -1,7 +1,7 @@
 # pledge-rs
 
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
-[![crates.io](http://meritbadge.herokuapp.com/hyper)](https://crates.io/crates/hyper)
+[![crates.io](http://meritbadge.herokuapp.com/pledge)](https://crates.io/crates/pledge)
 
 A Rust binding to OpenBSD's pledge(2) interface.
 
