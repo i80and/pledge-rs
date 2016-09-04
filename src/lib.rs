@@ -1,5 +1,6 @@
 use std::os::raw::c_int;
 
+#[derive(PartialEq,Eq,Debug)]
 pub enum Error {
     UnsupportedPlatform,
     Other(c_int),
@@ -93,7 +94,7 @@ pub fn pledge(_: &[Promise]) -> Result<(), Error> {
 
 #[cfg(test)]
 mod tests {
-    use super::{Promise, ToPromiseString};
+    use super::{pledge, Promise, ToPromiseString, Error};
 
     #[test]
     fn test_promise_str() {
@@ -101,5 +102,11 @@ mod tests {
         assert_eq!(vec![Promise::Dns].to_promise_string(), "dns");
         assert_eq!(vec![Promise::Stdio, Promise::ProtExec].to_promise_string(),
                    "stdio prot_exec");
+    }
+
+    #[test]
+    #[cfg(not(target_os = "openbsd"))]
+    fn test_pledge_unsupported() {
+        assert_eq!(pledge(&vec![Promise::Stdio]).unwrap_err(), Error::UnsupportedPlatform);
     }
 }
