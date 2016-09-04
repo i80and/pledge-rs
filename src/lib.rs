@@ -109,4 +109,11 @@ mod tests {
     fn test_pledge_unsupported() {
         assert_eq!(pledge(&vec![Promise::Stdio]).unwrap_err(), Error::UnsupportedPlatform);
     }
+
+    #[test]
+    #[cfg(target_os = "openbsd")]
+    fn test_pledge_supported() {
+        pledge(&vec![Promise::Stdio]).unwrap();
+        assert!(pledge(&vec![Promise::Stdio, Promise::Audio]).is_err());
+    }
 }
