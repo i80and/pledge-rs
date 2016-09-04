@@ -17,7 +17,7 @@ pub fn pledge_wrapper(promises: &[Promise]) -> Result<(), Error> {
     unsafe {
         return match pledge(cstr.as_ptr(), ptr::null()) {
             0 => Ok(()),
-            _ => Err(Error::Other(*libc::__erno())),
+            _ => Err(Error::Other(*libc::__errno())),
         };
     }
 }
