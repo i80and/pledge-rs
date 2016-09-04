@@ -107,10 +107,12 @@ macro_rules! pledge {
 
 #[cfg(test)]
 mod tests {
-    use super::{pledge, Promise, ToPromiseString};
+    use super::{Promise, pledge};
 
     #[test]
     fn test_promise_str() {
+        use super::{ToPromiseString};
+
         assert_eq!(vec![].to_promise_string(), "");
         assert_eq!(vec![Promise::Dns].to_promise_string(), "dns");
         assert_eq!(vec![Promise::Stdio, Promise::ProtExec].to_promise_string(),
