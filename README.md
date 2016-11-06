@@ -28,3 +28,13 @@ This is equivalent to:
             _ => ()
         }
     }
+
+Alternatively, it is also possible to directly use promises as string slice.
+
+    use pledge::pledge;
+
+    fn foo() {
+        if pledge("stdio rpath").is_err() {
+            panic!("Failed to pledge");
+        }
+    }

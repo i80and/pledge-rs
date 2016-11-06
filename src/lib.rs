@@ -97,11 +97,11 @@ mod openbsd;
 
 #[cfg(any(target_os = "bitrig",
           target_os = "openbsd"))]
-pub use openbsd::pledge_wrapper as pledge;
+pub use openbsd::pledge;
 
 #[cfg(not(any(target_os = "bitrig",
               target_os = "openbsd")))]
-pub fn pledge(_: &[Promise]) -> Result<(), Error> {
+pub fn pledge(_: &str) -> Result<(), Error> {
     return Err(Error::UnsupportedPlatform);
 }
 
@@ -109,11 +109,13 @@ pub fn pledge(_: &[Promise]) -> Result<(), Error> {
 macro_rules! pledge {
     ( $( $x:ident ),* ) => {
         {
+            use ToPromiseString;
             let mut promises = Vec::new();
             $(
                 promises.push(Promise::$x);
             )*
-            pledge(&promises)
+            let promises_str = promises.to_promise_string();
+            pledge(&promises_str)
         }
     };
 }
@@ -146,5 +148,14 @@ mod tests {
     fn test_pledge_supported() {
         pledge![Stdio].unwrap();
         assert!(pledge![Stdio, Audio].is_err());
+    }
+
+    #[test]
+    #[cfg(target_os = "openbsd")]
+    fn test_as_string() {
+        if pledge("stdio").is_err() {
+            panic!("pledge");
+        }
+        println!("hello world");
     }
 }
