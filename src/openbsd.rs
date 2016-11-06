@@ -4,15 +4,14 @@ use std::ffi::CString;
 use std::os::raw::{c_char, c_int};
 use std::ptr;
 
-use {Promise, Error, ToPromiseString};
+use Error;
 
-extern "C" {
-    fn pledge(promises: *const c_char, paths: *const *const c_char) -> c_int;
-}
+pub fn pledge(promises: &str) -> Result<(), Error> {
+    extern "C" {
+        fn pledge(promises: *const c_char, paths: *const *const c_char) -> c_int;
+    }
 
-pub fn pledge_wrapper(promises: &[Promise]) -> Result<(), Error> {
-    let promise_str = promises.to_promise_string();
-    let cstr = CString::new(promise_str).unwrap();
+    let cstr = CString::new(promises).unwrap();
 
     unsafe {
         return match pledge(cstr.as_ptr(), ptr::null()) {
