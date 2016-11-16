@@ -126,7 +126,7 @@ mod tests {
 
     #[test]
     fn test_promise_str() {
-        use super::{ToPromiseString};
+        use super::ToPromiseString;
 
         assert_eq!(vec![].to_promise_string(), "");
         assert_eq!(vec![Promise::Dns].to_promise_string(), "dns");
