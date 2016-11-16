@@ -22,10 +22,10 @@ pub fn pledge_with_paths(promises: &str, paths: &[&path::Path]) -> Result<(), Er
     let mut cpaths_raw = cpaths.iter()
         .map(|path| path.as_ptr())
         .collect::<Vec<*const libc::c_char>>();
-    cpaths_raw.push(ptr::null());
 
     unsafe {
         let cpaths_ptr = if !cpaths.is_empty() {
+            cpaths_raw.push(ptr::null());
             cpaths_raw.as_ptr()
         } else {
             ptr::null()
