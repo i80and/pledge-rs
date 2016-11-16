@@ -97,12 +97,16 @@ mod openbsd;
 
 #[cfg(any(target_os = "bitrig",
           target_os = "openbsd"))]
-pub use openbsd::pledge;
+pub use openbsd::pledge_with_paths;
 
 #[cfg(not(any(target_os = "bitrig",
               target_os = "openbsd")))]
-pub fn pledge(_: &str) -> Result<(), Error> {
+pub fn pledge_with_paths(_: &str, _: &[&std::path::Path]) -> Result<(), Error> {
     return Err(Error::UnsupportedPlatform);
+}
+
+pub fn pledge(promises: &str) -> Result<(), Error> {
+    return pledge_with_paths(promises, &[]);
 }
 
 #[macro_export]
