@@ -20,16 +20,16 @@ A Rust binding to OpenBSD's pledge(2) interface.
 This is equivalent to:
 
     extern crate pledge;
-    use pledge::{pledge, Promise};
+    use pledge::{pledge, Promise, ToPromiseString};
 
     fn foo() {
-        match pledge(&vec![Promise::Stdio, Promise::RPath]) {
+        match pledge(&vec![Promise::Stdio, Promise::RPath].to_promise_string()) {
             Err(_) => println!("Failed to pledge"),
             _ => ()
         }
     }
 
-Alternatively, it is also possible to directly use promises as string slice.
+You may also provide promises directly as a string:
 
     use pledge::pledge;
 
