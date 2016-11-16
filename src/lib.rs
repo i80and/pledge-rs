@@ -81,13 +81,16 @@ impl ToPromiseString for [Promise] {
     }
 }
 
-#[cfg(target_os = "openbsd")]
+#[cfg(any(target_os = "bitrig",
+          target_os = "openbsd"))]
 mod openbsd;
 
-#[cfg(target_os = "openbsd")]
+#[cfg(any(target_os = "bitrig",
+          target_os = "openbsd"))]
 pub use openbsd::pledge_wrapper as pledge;
 
-#[cfg(not(target_os = "openbsd"))]
+#[cfg(not(any(target_os = "bitrig",
+              target_os = "openbsd")))]
 pub fn pledge(_: &[Promise]) -> Result<(), Error> {
     return Err(Error::UnsupportedPlatform);
 }
@@ -120,14 +123,16 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(target_os = "openbsd"))]
+    #[cfg(not(any(target_os = "bitrig",
+                  target_os = "openbsd")))]
     fn test_pledge_unsupported() {
         use super::Error;
         assert_eq!(pledge![Stdio].unwrap_err(), Error::UnsupportedPlatform);
     }
 
     #[test]
-    #[cfg(target_os = "openbsd")]
+    #[cfg(any(target_os = "bitrig",
+              target_os = "openbsd"))]
     fn test_pledge_supported() {
         pledge![Stdio].unwrap();
         assert!(pledge![Stdio, Audio].is_err());
