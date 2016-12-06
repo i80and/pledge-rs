@@ -78,7 +78,7 @@ impl Promise {
     }
 }
 
-trait ToPromiseString {
+pub trait ToPromiseString {
     fn to_promise_string(&self) -> String;
 }
 
@@ -113,7 +113,12 @@ pub fn pledge(promises: &str) -> Result<(), Error> {
 macro_rules! pledge {
     ( $( $x:ident ),* ) => {
         {
-            use ToPromiseString;
+            #[cfg(not(test))]
+            use pledge::{Promise, ToPromiseString};
+
+            #[cfg(test)]
+            use {Promise, ToPromiseString};
+
             let mut promises = Vec::new();
             $(
                 promises.push(Promise::$x);
