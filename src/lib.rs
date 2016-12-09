@@ -113,12 +113,6 @@ pub fn pledge(promises: &str) -> Result<(), Error> {
 macro_rules! pledge {
     ( $( $x:ident ),* ) => {
         {
-            #[cfg(not(test))]
-            use pledge::{Promise, ToPromiseString};
-
-            #[cfg(test)]
-            use {Promise, ToPromiseString};
-
             let mut promises = Vec::new();
             $(
                 promises.push(Promise::$x);
@@ -131,7 +125,7 @@ macro_rules! pledge {
 
 #[cfg(test)]
 mod tests {
-    use super::{Promise, pledge};
+    use super::{Promise, ToPromiseString, pledge};
 
     #[test]
     fn test_promise_str() {
