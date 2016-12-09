@@ -8,7 +8,7 @@ A Rust binding to OpenBSD's pledge(2) interface.
 ## Usage
 
     #[macro_use] extern crate pledge;
-    use pledge::pledge;
+    use pledge::{pledge, Promise, ToPromiseString};
 
     fn foo() {
         match pledge![Stdio, RPath] {
