@@ -1,6 +1,5 @@
 use std::os::raw::c_int;
-use std::error;
-use std::fmt;
+use std::{error, fmt};
 
 #[derive(PartialEq,Eq,Debug)]
 pub enum Error {
