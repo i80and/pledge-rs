@@ -1,9 +1,29 @@
 use std::os::raw::c_int;
+use std::error;
+use std::fmt;
 
 #[derive(PartialEq,Eq,Debug)]
 pub enum Error {
     UnsupportedPlatform,
     Other(c_int),
+}
+
+impl fmt::Display for Error {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match *self {
+            Error::UnsupportedPlatform => write!(f, "plegde is unsupported on this platform"),
+            Error::Other(errno) => write!(f, "unable to pledge ({})", errno)
+        }
+    }
+}
+
+impl error::Error for Error {
+    fn description(&self) -> &str {
+        match *self {
+            Error::UnsupportedPlatform => "plegde is unsupported on this platform",
+            Error::Other(_) => "unable to pledge"
+        }
+    }
 }
 
 pub enum Promise {
