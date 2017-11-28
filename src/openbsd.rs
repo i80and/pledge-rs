@@ -19,7 +19,8 @@ pub fn pledge_with_paths(promises: &str, paths: &[&path::Path]) -> Result<(), Er
         cpaths.push(CString::new(path.as_os_str().as_bytes()).unwrap());
     }
 
-    let mut cpaths_raw = cpaths.iter()
+    let mut cpaths_raw = cpaths
+        .iter()
         .map(|path| path.as_ptr())
         .collect::<Vec<*const libc::c_char>>();
 

@@ -11,7 +11,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::UnsupportedPlatform => write!(f, "pledge is unsupported on this platform"),
-            Error::Other(errno) => write!(f, "unable to pledge ({})", errno)
+            Error::Other(errno) => write!(f, "unable to pledge ({})", errno),
         }
     }
 }
@@ -20,7 +20,7 @@ impl error::Error for Error {
     fn description(&self) -> &str {
         match *self {
             Error::UnsupportedPlatform => "pledge is unsupported on this platform",
-            Error::Other(_) => "unable to pledge"
+            Error::Other(_) => "unable to pledge",
         }
     }
 }
@@ -61,7 +61,7 @@ pub enum Promise {
 
 impl Promise {
     pub fn to_promise_string(&self) -> &'static str {
-        return match *self {
+        match *self {
             Promise::Audio => "audio",
             Promise::Chown => "chown",
             Promise::CPath => "cpath",
@@ -93,7 +93,7 @@ impl Promise {
             Promise::Vminfo => "vminfo",
             Promise::Vmm => "vmm",
             Promise::WPath => "wpath",
-        };
+        }
     }
 }
 
@@ -103,29 +103,26 @@ pub trait ToPromiseString {
 
 impl ToPromiseString for [Promise] {
     fn to_promise_string(&self) -> String {
-        return self.iter()
+        self.iter()
             .map(|p| p.to_promise_string())
             .collect::<Vec<&'static str>>()
-            .join(" ");
+            .join(" ")
     }
 }
 
-#[cfg(any(target_os = "bitrig",
-          target_os = "openbsd"))]
+#[cfg(any(target_os = "bitrig", target_os = "openbsd"))]
 mod openbsd;
 
-#[cfg(any(target_os = "bitrig",
-          target_os = "openbsd"))]
+#[cfg(any(target_os = "bitrig", target_os = "openbsd"))]
 pub use openbsd::pledge_with_paths;
 
-#[cfg(not(any(target_os = "bitrig",
-              target_os = "openbsd")))]
+#[cfg(not(any(target_os = "bitrig", target_os = "openbsd")))]
 pub fn pledge_with_paths(_: &str, _: &[&std::path::Path]) -> Result<(), Error> {
-    return Err(Error::UnsupportedPlatform);
+    Err(Error::UnsupportedPlatform)
 }
 
 pub fn pledge(promises: &str) -> Result<(), Error> {
-    return pledge_with_paths(promises, &[]);
+    pledge_with_paths(promises, &[])
 }
 
 #[macro_export]
@@ -144,7 +141,7 @@ macro_rules! pledge {
 
 #[cfg(test)]
 mod tests {
-    use super::{Promise, ToPromiseString, pledge};
+    use super::{pledge, Promise, ToPromiseString};
 
     #[test]
     fn test_promise_str() {
@@ -152,21 +149,21 @@ mod tests {
 
         assert_eq!(vec![].to_promise_string(), "");
         assert_eq!(vec![Promise::Dns].to_promise_string(), "dns");
-        assert_eq!(vec![Promise::Stdio, Promise::ProtExec].to_promise_string(),
-                   "stdio prot_exec");
+        assert_eq!(
+            vec![Promise::Stdio, Promise::ProtExec].to_promise_string(),
+            "stdio prot_exec"
+        );
     }
 
     #[test]
-    #[cfg(not(any(target_os = "bitrig",
-                  target_os = "openbsd")))]
+    #[cfg(not(any(target_os = "bitrig", target_os = "openbsd")))]
     fn test_pledge_unsupported() {
         use super::Error;
         assert_eq!(pledge![Stdio].unwrap_err(), Error::UnsupportedPlatform);
     }
 
     #[test]
-    #[cfg(any(target_os = "bitrig",
-              target_os = "openbsd"))]
+    #[cfg(any(target_os = "bitrig", target_os = "openbsd"))]
     fn test_pledge_supported() {
         pledge![Stdio].unwrap();
         assert!(pledge![Stdio, Audio].is_err());
