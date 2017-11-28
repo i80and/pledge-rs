@@ -27,6 +27,7 @@ impl error::Error for Error {
 
 pub enum Promise {
     Audio,
+    Bpf,
     Chown,
     CPath,
     DiskLabel,
@@ -51,6 +52,7 @@ pub enum Promise {
     Sendfd,
     Settime,
     Stdio,
+    Tape,
     TMPPath,
     Tty,
     Unix,
@@ -63,6 +65,7 @@ impl Promise {
     pub fn to_promise_string(&self) -> &'static str {
         match *self {
             Promise::Audio => "audio",
+            Promise::Bpf => "bpf",
             Promise::Chown => "chown",
             Promise::CPath => "cpath",
             Promise::DiskLabel => "disklabel",
@@ -87,6 +90,7 @@ impl Promise {
             Promise::Sendfd => "sendfd",
             Promise::Settime => "settime",
             Promise::Stdio => "stdio",
+            Promise::Tape => "tape",
             Promise::TMPPath => "tmppath",
             Promise::Tty => "tty",
             Promise::Unix => "unix",
