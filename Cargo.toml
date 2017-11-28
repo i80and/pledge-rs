@@ -5,8 +5,12 @@ authors = ["Andrew Aldridge <i80and@foxquill.com>"]
 description = "Rust binding to OpenBSD's pledge(2) interface"
 readme = "README.md"
 repository = "https://github.com/i80and/pledge-rs"
+documentation = "https://docs.rs/pledge/"
 keywords = ["openbsd", "binding", "security"]
 license = "MIT"
 
 [dependencies]
 libc = "0.2"
+
+[badges]
+travis-ci = { repository = "i80and/pledge-rs" }
