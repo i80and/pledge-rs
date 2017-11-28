@@ -1,0 +1,11 @@
+language: rust
+sudo: false
+dist: trusty
+
+matrix:
+    include:
+        - rust: stable
+        - rust: beta
+
+notifications:
+    email: false
