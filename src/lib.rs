@@ -1,9 +1,12 @@
+use std::ffi::NulError;
 use std::os::raw::c_int;
 use std::{error, fmt};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum Error {
     UnsupportedPlatform,
+    Promises(NulError),
+    Execpromises(NulError),
     Other(c_int),
 }
 
@@ -11,6 +14,8 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             Error::UnsupportedPlatform => write!(f, "pledge is unsupported on this platform"),
+            Error::Promises(_) => write!(f, "unexpected NUL character in promises argument"),
+            Error::Execpromises(_) => write!(f, "unexpected NUL character in execpromises argument"),
             Error::Other(errno) => write!(f, "unable to pledge ({})", errno),
         }
     }
@@ -20,6 +25,8 @@ impl error::Error for Error {
     fn description(&self) -> &str {
         match *self {
             Error::UnsupportedPlatform => "pledge is unsupported on this platform",
+            Error::Promises(_) => "unexpected NUL character in promises argument",
+            Error::Execpromises(_) => "unexpected NUL character in execpromises argument",
             Error::Other(_) => "unable to pledge",
         }
     }
@@ -114,31 +121,61 @@ impl ToPromiseString for [Promise] {
     }
 }
 
-#[cfg(any(target_os = "bitrig", target_os = "openbsd"))]
+#[cfg(target_os = "openbsd")]
 mod openbsd;
 
-#[cfg(any(target_os = "bitrig", target_os = "openbsd"))]
-pub use openbsd::pledge_with_paths;
+#[cfg(target_os = "openbsd")]
+pub use openbsd::pledge;
 
-#[cfg(not(any(target_os = "bitrig", target_os = "openbsd")))]
-pub fn pledge_with_paths(_: &str, _: &[&std::path::Path]) -> Result<(), Error> {
+#[cfg(not(target_os = "openbsd"))]
+pub fn pledge<'p, 'e, P, E>(_: P, _: E) -> Result<(), Error>
+where P: Into<Option<&'p str>>, E: Into<Option<&'e str>> {
     Err(Error::UnsupportedPlatform)
-}
-
-pub fn pledge(promises: &str) -> Result<(), Error> {
-    pledge_with_paths(promises, &[])
 }
 
 #[macro_export]
 macro_rules! pledge {
-    ( $( $x:ident ),* ) => {
+    [$($promises:ident)*, $($execpromises:ident)*] => {
+        {
+            let mut promises = Vec::new();
+            let mut execpromises = Vec::new();
+            $(
+                promises.push(Promise::$promises);
+            )*
+            $(
+                execpromises.push(Promise::$execpromises);
+            )*
+            let promises = promises.to_promise_string();
+            let execpromises = execpromises.to_promise_string();
+            pledge(&*promises, &*execpromises)
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! pledge_promises {
+    [$($promises:ident)*] => {
         {
             let mut promises = Vec::new();
             $(
-                promises.push(Promise::$x);
+                promises.push(Promise::$promises);
             )*
-            let promises_str = promises.to_promise_string();
-            pledge(&promises_str)
+            let promises = promises.to_promise_string();
+            pledge(&*promises, None)
+        }
+    };
+}
+
+#[macro_export]
+macro_rules! pledge_execpromises {
+    [$($execpromises:ident)*] => {
+        {
+            let mut execpromises = Vec::new();
+            $(
+                execpromises.push(Promise::$execpromises);
+            )*
+            let execpromises = execpromises.to_promise_string();
+            pledge(None, &*execpromises)
         }
     };
 }
@@ -160,25 +197,23 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(any(target_os = "bitrig", target_os = "openbsd")))]
+    #[cfg(not(target_os = "openbsd"))]
     fn test_pledge_unsupported() {
         use super::Error;
-        assert_eq!(pledge![Stdio].unwrap_err(), Error::UnsupportedPlatform);
+        assert_eq!(pledge_promises![Stdio].unwrap_err(), Error::UnsupportedPlatform);
     }
 
     #[test]
-    #[cfg(any(target_os = "bitrig", target_os = "openbsd"))]
+    #[cfg(target_os = "openbsd")]
     fn test_pledge_supported() {
-        pledge![Stdio].unwrap();
-        assert!(pledge![Stdio, Audio].is_err());
+        pledge_promises![Stdio].unwrap();
+        assert!(pledge_promises![Stdio Audio].is_err());
     }
 
     #[test]
     #[cfg(target_os = "openbsd")]
     fn test_as_string() {
-        if pledge("stdio").is_err() {
-            panic!("pledge");
-        }
+        pledge("stdio", None).unwrap();
         println!("hello world");
     }
 }
