@@ -66,6 +66,10 @@ pub enum Promise {
     Vminfo,
     Vmm,
     WPath,
+
+    // FIXME rust-lang/rust#44109
+    #[doc(hidden)]
+    _NonExhaustive,
 }
 
 impl Promise {
