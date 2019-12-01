@@ -5,6 +5,21 @@
 
 A Rust binding to OpenBSD's pledge(2) interface.
 
+## Compatibility
+
+This version of the crate is compatible with the [OpenBSD 6.3+ interface], where
+the second parameter restricts the privileges of the process after execve(2),
+and guaranteed to be compatible with Rust 1.24.0+ (as shipped by OpenBSD 6.3).
+
+Use version `^0.3` for the [OpenBSD 5.9+ interface], where the second parameter
+sets a whitelist of permitted paths. See the [unveil crate] for [unveil(2)], the
+path whitelisting API introduced in OpenBSD 6.4.
+
+[OpenBSD 6.3+ interface]: https://man.openbsd.org/OpenBSD-6.3/pledge.2
+[OpenBSD 5.9+ interface]: https://man.openbsd.org/OpenBSD-5.9/pledge.2
+[unveil crate]: https://crates.io/crates/unveil
+[unveil(2)]: https://man.openbsd.org/OpenBSD-6.4/unveil.2
+
 ## Usage
 
     #[macro_use] extern crate pledge;
