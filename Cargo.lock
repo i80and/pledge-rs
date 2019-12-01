@@ -1,0 +1,28 @@
+[[package]]
+name = "libc"
+version = "0.2.66"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "pledge"
+version = "0.3.1"
+dependencies = [
+ "libc 0.2.66 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "pledge-example-2015"
+version = "0.0.0"
+dependencies = [
+ "pledge 0.3.1",
+]
+
+[[package]]
+name = "pledge-example-2018"
+version = "0.0.0"
+dependencies = [
+ "pledge 0.3.1",
+]
+
+[metadata]
+"checksum libc 0.2.66 (registry+https://github.com/rust-lang/crates.io-index)" = "d515b1f41455adea1313a4a2ac8a8a477634fbae63cc6100e3aebb207ce61558"

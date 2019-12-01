@@ -7,77 +7,69 @@ A Rust binding to OpenBSD's pledge(2) interface.
 
 ## Usage
 
-    #[macro_use] extern crate pledge;
-    use pledge::{pledge, Promise, ToPromiseString};
+    /* Rust 2015 only */ #[macro_use] extern crate pledge;
+    /* Rust 2018 only */ use pledge::{pledge, pledge_promises, pledge_execpromises};
 
     fn foo() {
         // make both promises and execpromises
-        match pledge![Stdio Proc Exec, Stdio Tty] {
-            Err(_) => println!("Failed to pledge"),
-            _ => ()
-        }
+        pledge![Stdio Proc Exec, Stdio Tty].unwrap();
 
         // make promises only
-        match pledge_promises[Stdio Exec] {
-            Err(_) => println!("Failed to pledge"),
-            _ => ()
-        }
+        pledge_promises![Stdio Exec].unwrap();
 
         // make execpromises only
-        match pledge_execpromises[Stdio] {
-            Err(_) => println!("Failed to pledge"),
-            _ => ()
-        }
+        pledge_execpromises![Stdio].unwrap();
     }
 
-This is equivalent to:
+This is roughly equivalent to:
 
-    extern crate pledge;
+    /* Rust 2015 only */ extern crate pledge;
     use pledge::{pledge, Promise, ToPromiseString};
 
     fn foo() {
         // make both promises and execpromises
         let promises = vec![Promise::Stdio, Promise::Proc, Promise::Exec];
         let execpromises = vec![Promise::Stdio, Promise::Tty];
-        match pledge(&*promises.to_promise_string(), &*execpromises.to_promise_string()) {
-            Err(_) => println!("Failed to pledge"),
-            _ => ()
-        }
+        pledge(&*promises.to_promise_string(), &*execpromises.to_promise_string()).unwrap();
 
         // make promises only
         let promises = vec![Promise::Stdio, Promise::Exec];
-        match pledge(&*promises.to_promise_string(), None) {
-            Err(_) => println!("Failed to pledge"),
-            _ => ()
-        }
+        pledge(&*promises.to_promise_string(), None).unwrap();
 
         // make execpromises only
         let execpromises = vec![Promise::Stdio];
-        match pledge(None, &*execpromises.to_promise_string()) {
-            Err(_) => println!("Failed to pledge"),
-            _ => ()
-        }
+        pledge(None, &*execpromises.to_promise_string()).unwrap();
     }
 
 You may also provide promises directly as a string:
 
+    /* Rust 2015 only */ extern crate pledge;
     use pledge::pledge;
 
     fn foo() {
         // make both promises and execpromises
-        if pledge("stdio proc exec", "stdio tty").is_err() {
-            panic!("Failed to pledge");
-        }
+        pledge("stdio proc exec", "stdio tty").unwrap();
 
         // make promises only
-        if pledge("stdio exec", None).is_err() {
-            panic!("Failed to pledge");
-        }
+        pledge("stdio exec", None).unwrap();
 
         // make execpromises only
-        if pledge(None, "stdio").is_err() {
-            panic!("Failed to pledge");
-        }
+        pledge(None, "stdio").unwrap();
+    }
+
+All of these will fail on platforms other than OpenBSD. You can use conditional
+compilation to make your program portable to other platforms:
+
+    /* Rust 2015 only */ extern crate pledge;
+    /* Rust 2018 only */ use pledge::pledge_promises;
+
+    fn foo() {
+        ...
+
+        #[cfg(target_os = "openbsd")]
+        pledge_promises![Stdio Exec];
+
+        ...
     }
 
 ## Compatibility
@@ -90,7 +82,7 @@ where the second parameter sets a whitelist of permitted paths.
 
 To migrate your code from older versions:
 
-* change `pledge![P, Q, R]` call sites to `pledge_promises![P, Q, R]`
+* change `pledge![P, Q, R]` call sites to `pledge_promises![P Q R]`
 * change `pledge("p q r")` call sites to `pledge("p q r", None)`
 * change `pledge_with_paths(promises, paths)` to `pledge(promises)`
 * consider making execpromises to restrict processes after execve(2)
