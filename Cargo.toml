@@ -9,6 +9,9 @@ documentation = "https://docs.rs/pledge/"
 keywords = ["openbsd", "binding", "security"]
 license = "MIT"
 
+[workspace]
+members = ["variants"]
+
 [dependencies]
 libc = "0.2"
 
