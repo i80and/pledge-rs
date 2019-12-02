@@ -83,7 +83,8 @@ You may also provide promises directly as a string:
 ## Compatibility
 
 This version of the crate is compatible with the [OpenBSD 6.3+ interface], where
-the second parameter restricts the privileges of the process after execve(2).
+the second parameter restricts the privileges of the process after execve(2),
+and guaranteed to be compatible with Rust 1.24.0+ (as shipped by OpenBSD 6.3).
 
 Use version `^0.3` for the [OpenBSD 5.9+ interface] last supported by [Bitrig],
 where the second parameter sets a whitelist of permitted paths.
@@ -93,6 +94,7 @@ To migrate your code from older versions:
 * change `pledge![P, Q, R]` call sites to `pledge_promises![P, Q, R]`
 * change `pledge("p q r")` call sites to `pledge("p q r", None)`
 * change `pledge_with_paths(promises, paths)` to `pledge(promises)`
+* update usage of renamed `Promise` variants (e.g. `MCast` → `Mcast`)
 * consider making execpromises to restrict processes after execve(2)
 * consider using [unveil(2)] and the [unveil crate] (OpenBSD 6.4+)
 
