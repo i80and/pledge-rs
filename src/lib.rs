@@ -143,11 +143,11 @@ macro_rules! pledge {
                 promises.push($crate::Promise::$promises);
             )*
             $(
-                execpromises.push(::pledge::Promise::$execpromises);
+                execpromises.push($crate::Promise::$execpromises);
             )*
             let promises = $crate::ToPromiseString::to_promise_string(&*promises);
             let execpromises = $crate::ToPromiseString::to_promise_string(&*execpromises);
-            ::pledge::pledge(&*promises, &*execpromises)
+            $crate::pledge(&*promises, &*execpromises)
         }
     };
 }
