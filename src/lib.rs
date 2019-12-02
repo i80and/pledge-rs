@@ -1,3 +1,5 @@
+mod promise;
+
 use std::ffi::NulError;
 use std::os::raw::c_int;
 use std::{error, fmt};
@@ -32,81 +34,7 @@ impl error::Error for Error {
     }
 }
 
-pub enum Promise {
-    Audio,
-    Bpf,
-    Chown,
-    CPath,
-    DiskLabel,
-    Dns,
-    DPath,
-    Drm,
-    Exec,
-    Fattr,
-    Flock,
-    Getpw,
-    Id,
-    Inet,
-    Ioctl,
-    MCast,
-    Pf,
-    Proc,
-    ProtExec,
-    Ps,
-    Recvfd,
-    Route,
-    RPath,
-    Sendfd,
-    Settime,
-    Stdio,
-    Tape,
-    TMPPath,
-    Tty,
-    Unix,
-    Vminfo,
-    Vmm,
-    WPath,
-}
-
-impl Promise {
-    pub fn to_promise_string(&self) -> &'static str {
-        match *self {
-            Promise::Audio => "audio",
-            Promise::Bpf => "bpf",
-            Promise::Chown => "chown",
-            Promise::CPath => "cpath",
-            Promise::DiskLabel => "disklabel",
-            Promise::Dns => "dns",
-            Promise::DPath => "dpath",
-            Promise::Drm => "drm",
-            Promise::Exec => "exec",
-            Promise::Fattr => "fattr",
-            Promise::Flock => "flock",
-            Promise::Getpw => "getpw",
-            Promise::Id => "id",
-            Promise::Inet => "inet",
-            Promise::Ioctl => "ioctl",
-            Promise::MCast => "mcast",
-            Promise::Pf => "pf",
-            Promise::Proc => "proc",
-            Promise::ProtExec => "prot_exec",
-            Promise::Ps => "ps",
-            Promise::Recvfd => "recvfd",
-            Promise::Route => "route",
-            Promise::RPath => "rpath",
-            Promise::Sendfd => "sendfd",
-            Promise::Settime => "settime",
-            Promise::Stdio => "stdio",
-            Promise::Tape => "tape",
-            Promise::TMPPath => "tmppath",
-            Promise::Tty => "tty",
-            Promise::Unix => "unix",
-            Promise::Vminfo => "vminfo",
-            Promise::Vmm => "vmm",
-            Promise::WPath => "wpath",
-        }
-    }
-}
+pub use promise::Promise;
 
 pub trait ToPromiseString {
     fn to_promise_string(&self) -> String;
