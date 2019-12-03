@@ -12,6 +12,15 @@ pub enum Error {
     Other(c_int),
 }
 
+impl Error {
+    pub fn ignore_platform(self) -> Result<(), Self> {
+        match self {
+            Error::UnsupportedPlatform => Ok(()),
+            x => Err(x),
+        }
+    }
+}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {

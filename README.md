@@ -57,8 +57,9 @@ You may also provide promises directly as a string:
         pledge(None, "stdio").unwrap();
     }
 
-All of these will fail on platforms other than OpenBSD. You can use conditional
-compilation to make your program portable to other platforms:
+All of these will yield `pledge::Error::UnsupportedPlatform` on platforms that
+don’t support pledge(2). You can use `pledge::Error::ignore_platform` to ignore
+that variant and make your program portable to those platforms:
 
     /* Rust 2015 only */ extern crate pledge;
     /* Rust 2018 only */ use pledge::pledge_promises;
@@ -66,8 +67,9 @@ compilation to make your program portable to other platforms:
     fn foo() {
         ...
 
-        #[cfg(target_os = "openbsd")]
-        pledge_promises![Stdio Exec];
+        pledge_promises![Stdio Exec]
+            .or_else(pledge::Error::ignore_platform)
+            .unwrap();
 
         ...
     }
