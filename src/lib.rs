@@ -12,6 +12,15 @@ pub enum Error {
     Other(c_int),
 }
 
+impl Error {
+    pub fn ignore_platform(self) -> Result<(), Self> {
+        match self {
+            Error::UnsupportedPlatform => Ok(()),
+            x => Err(x),
+        }
+    }
+}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
@@ -68,14 +77,14 @@ macro_rules! pledge {
             let mut promises = Vec::new();
             let mut execpromises = Vec::new();
             $(
-                promises.push(Promise::$promises);
+                promises.push($crate::Promise::$promises);
             )*
             $(
-                execpromises.push(Promise::$execpromises);
+                execpromises.push($crate::Promise::$execpromises);
             )*
-            let promises = promises.to_promise_string();
-            let execpromises = execpromises.to_promise_string();
-            pledge(&*promises, &*execpromises)
+            let promises = $crate::ToPromiseString::to_promise_string(&*promises);
+            let execpromises = $crate::ToPromiseString::to_promise_string(&*execpromises);
+            $crate::pledge(&*promises, &*execpromises)
         }
     };
 }
@@ -86,10 +95,10 @@ macro_rules! pledge_promises {
         {
             let mut promises = Vec::new();
             $(
-                promises.push(Promise::$promises);
+                promises.push($crate::Promise::$promises);
             )*
-            let promises = promises.to_promise_string();
-            pledge(&*promises, None)
+            let promises = $crate::ToPromiseString::to_promise_string(&*promises);
+            $crate::pledge(&*promises, None)
         }
     };
 }
@@ -100,10 +109,10 @@ macro_rules! pledge_execpromises {
         {
             let mut execpromises = Vec::new();
             $(
-                execpromises.push(Promise::$execpromises);
+                execpromises.push($crate::Promise::$execpromises);
             )*
-            let execpromises = execpromises.to_promise_string();
-            pledge(None, &*execpromises)
+            let execpromises = $crate::ToPromiseString::to_promise_string(&*execpromises);
+            $crate::pledge(None, &*execpromises)
         }
     };
 }
