@@ -15,19 +15,19 @@ where P: Into<Option<&'p str>>, E: Into<Option<&'e str>> {
     let promises = promises.into().map(|x| CString::new(x).map_err(Error::Promises));
     let execpromises = execpromises.into().map(|x| CString::new(x).map_err(Error::Execpromises));
 
+    let promises = match promises {
+        Some(Ok(ref result)) => Ok(result.as_ptr()),
+        Some(Err(error)) => Err(error),
+        None => Ok(ptr::null()),
+    }?;
+
+    let execpromises = match execpromises {
+        Some(Ok(ref result)) => Ok(result.as_ptr()),
+        Some(Err(error)) => Err(error),
+        None => Ok(ptr::null()),
+    }?;
+
     unsafe {
-        let promises = match promises {
-            Some(Ok(ref result)) => Ok(result.as_ptr()),
-            Some(Err(error)) => Err(error),
-            None => Ok(ptr::null()),
-        }?;
-
-        let execpromises = match execpromises {
-            Some(Ok(ref result)) => Ok(result.as_ptr()),
-            Some(Err(error)) => Err(error),
-            None => Ok(ptr::null()),
-        }?;
-
         return match pledge(promises, execpromises) {
             0 => Ok(()),
             _ => Err(Error::Other(*libc::__errno())),
