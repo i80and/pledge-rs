@@ -12,8 +12,8 @@ use scraper::{ElementRef, Html, Selector};
 use self::promise::Promise;
 
 const IOCTL: &'_ str = r#"dt > a[href$="/ioctl.2"]"#;
-const OTHER: &'_ str = r#"dt > var"#;
-const VAR: &'_ str = r#"var"#;
+const IOCTL_REQUESTS: &'_ str = r#"var.Va, code.Cm"#; // <7.0, 7.0+
+const OTHER_REQUESTS: &'_ str = r#"dt > var.Va, dt > a > code.Cm"#; // <7.0, 7.0+
 
 fn address(version: usize) -> String {
     format!(
@@ -49,8 +49,8 @@ fn main() -> Result<(), Box<dyn Error>> {
         let document = Html::parse_document(&response.text()?);
 
         let ioctl = Selector::parse(IOCTL).expect("selector is static");
-        let other = Selector::parse(OTHER).expect("selector is static");
-        let var = Selector::parse(VAR).expect("selector is static");
+        let ioctl_requests = Selector::parse(IOCTL_REQUESTS).expect("selector is static");
+        let other_requests = Selector::parse(OTHER_REQUESTS).expect("selector is static");
 
         let keywords = document
             .select(&ioctl)
@@ -61,8 +61,8 @@ fn main() -> Result<(), Box<dyn Error>> {
                     .find_map(ElementRef::wrap)
             })
             .iter()
-            .flat_map(|x| x.select(&var))
-            .chain(document.select(&other))
+            .flat_map(|x| x.select(&ioctl_requests))
+            .chain(document.select(&other_requests))
             .collect::<Vec<_>>();
 
         for keyword in keywords {
