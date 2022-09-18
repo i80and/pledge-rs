@@ -10,7 +10,7 @@ keywords = ["openbsd", "binding", "security"]
 license = "MIT"
 
 [workspace]
-members = ["variants", "example-2015", "example-2018"]
+members = ["example-2015", "example-2018"]
 
 [dependencies]
 libc = "0.2"

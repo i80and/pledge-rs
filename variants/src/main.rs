@@ -25,14 +25,14 @@ fn address(version: usize) -> String {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let mut promises: BTreeMap<String, Promise> = Default::default();
-    let client = reqwest::Client::new();
+    let client = reqwest::blocking::Client::new();
 
     for version in 59.. {
         let address = address(version);
 
         eprintln!("{}", address);
 
-        let mut response = client.get(&address).send()?;
+        let response = client.get(&address).send()?;
 
         match response.status() {
             // stop: OpenBSD version not found

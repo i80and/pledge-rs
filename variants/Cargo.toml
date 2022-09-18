@@ -1,3 +1,5 @@
+[workspace]
+
 [package]
 name = "pledge-variants"
 version = "0.0.0"
@@ -6,5 +8,5 @@ edition = "2018"
 publish = false
 
 [dependencies]
-reqwest = "0.9.22"
+reqwest = { version = "0.11.11", features = ["blocking"] }
 scraper = "0.11.0"
