@@ -12,8 +12,10 @@ use scraper::{ElementRef, Html, Selector};
 use self::promise::Promise;
 
 const IOCTL: &'_ str = r#"dt > a[href$="/ioctl.2"]"#;
-const IOCTL_REQUESTS: &'_ str = r#"var.Va, code.Cm"#; // <7.0, 7.0+
-const OTHER_REQUESTS: &'_ str = r#"dt > var.Va, dt > a > code.Cm"#; // <7.0, 7.0+
+const IOCTL_REQUESTS_59: &'_ str = r#"var.Va"#; // <7.0
+const IOCTL_REQUESTS_70: &'_ str = r#"code.Cm"#; // 7.0+
+const OTHER_REQUESTS_59: &'_ str = r#"dt > var.Va"#; // <7.0
+const OTHER_REQUESTS_70: &'_ str = r#"dt > a > code.Cm"#; // 7.0+
 
 fn address(version: usize) -> String {
     format!(
@@ -49,8 +51,18 @@ fn main() -> Result<(), Box<dyn Error>> {
         let document = Html::parse_document(&response.text()?);
 
         let ioctl = Selector::parse(IOCTL).expect("selector is static");
-        let ioctl_requests = Selector::parse(IOCTL_REQUESTS).expect("selector is static");
-        let other_requests = Selector::parse(OTHER_REQUESTS).expect("selector is static");
+        let ioctl_requests = if version >= 70 {
+            IOCTL_REQUESTS_70
+        } else {
+            IOCTL_REQUESTS_59
+        };
+        let ioctl_requests = Selector::parse(ioctl_requests).expect("selector is static");
+        let other_requests = if version >= 70 {
+            OTHER_REQUESTS_70
+        } else {
+            OTHER_REQUESTS_59
+        };
+        let other_requests = Selector::parse(other_requests).expect("selector is static");
 
         let keywords = document
             .select(&ioctl)
